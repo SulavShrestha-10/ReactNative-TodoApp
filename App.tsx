@@ -1,20 +1,39 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { AuthProvider, useAuth } from "./AuthContext";
+import List from "./app/screens/List";
+import Login from "./app/screens/Login";
 
+const Stack = createNativeStackNavigator();
+const InsideStack = createNativeStackNavigator();
+const InsideLayout = () => {
+	return (
+		<InsideStack.Navigator>
+			<InsideStack.Screen name="Todo List" component={List} />
+		</InsideStack.Navigator>
+	);
+};
+const AuthNavigator = () => {
+	const { user } = useAuth();
+	console.log("User: ", user);
+
+	return (
+		<Stack.Navigator initialRouteName="Login">
+			{user ? (
+				<Stack.Screen name="Todo" component={InsideLayout} options={{ headerShown: false }} />
+			) : (
+				<Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+			)}
+		</Stack.Navigator>
+	);
+};
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+	return (
+		<AuthProvider>
+			<NavigationContainer>
+				<AuthNavigator />
+			</NavigationContainer>
+		</AuthProvider>
+	);
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
